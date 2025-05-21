@@ -1,1 +1,84 @@
-# astronomy-chat
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>天文學家的小專家答疑室</title>
+  <style>
+    body {
+      background: #0b1e3d;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    #chatbox {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #162d50;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    .msg {
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    .user {
+      color: #ffc107;
+      font-weight: bold;
+    }
+    .bot {
+      color: #80d8ff;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chatbox">
+    <div class="msg bot">🌌 星空關注專家在此！請說出你對宇宙的好奇問題，我會用精準的天文知識為你解說！</div>
+  </div>
+  <input id="userInput" type="text" placeholder="請輸入你想問的天文問題...">
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    const input = document.getElementById('userInput');
+
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        // 顯示用戶問題
+        chatbox.innerHTML += `<div class="msg user">🧡 你：${msg}</div>`;
+        input.value = '';
+
+        // 發送請求給 Gemini API
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyAjsIPjqqvbWlHQI3gzFXv1kZeKsEmNBOI', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{
+                  text: `你是一位熱情且知識淵博的天文學家，專長於解釋恆星、行星、星系與黑洞，請用有趣又易懂的方式，回答使用者提出的天文相關問題。\n\n使用者提問：「${msg}」`
+                }]
+              }
+            ]
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '抱歉，我無法回答這個問題。';
+        chatbox.innerHTML += `<div class="msg bot">🪐 ${reply}</div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>
