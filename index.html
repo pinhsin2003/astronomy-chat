@@ -52,30 +52,23 @@
       if (e.key === 'Enter') {
         const msg = input.value.trim();
         if (!msg) return;
-
-        // 顯示用戶問題
-        chatbox.innerHTML += `<div class="msg user">🧡 你：${msg}</div>`;
+        chatbox.innerHTML += `<div class="msg user">🧡 你：<strong>${msg}</strong></div>`;
         input.value = '';
 
-        // 發送請求給 Gemini API
-        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyAjsIPjqqvbWlHQI3gzFXv1kZeKsEmNBOI', {
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyAjsIPjqqvbWlHQI3gzFXv1kZeKsEmNBOI', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{
-                  text: `你是一位熱情且知識淵博的天文學家，專長於解釋恆星、行星、星系與黑洞，請用有趣又易懂的方式，回答使用者提出的天文相關問題。\n\n使用者提問：「${msg}」`
-                }]
-              }
-            ]
+            contents: [{
+              role: 'user',
+              parts: [{ text: `你是一位熱情且知識淵博的天文學家，請用簡單、有趣、清楚的方式解釋下列天文問題：${msg}` }]
+            }]
           })
         });
 
         const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '抱歉，我無法回答這個問題。';
-        chatbox.innerHTML += `<div class="msg bot">🪐 ${reply}</div>`;
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '抱歉，我無法回答這個問題';
+        chatbox.innerHTML += `<div class="msg bot">🔭 ${reply}</div>`;
         chatbox.scrollTop = chatbox.scrollHeight;
       }
     });
